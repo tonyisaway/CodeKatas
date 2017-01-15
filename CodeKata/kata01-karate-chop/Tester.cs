@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
 
     using NUnit.Framework;
 
@@ -11,39 +12,60 @@
         private const int NotFound = -1;
 
         [Test, TestCaseSource(typeof(Kata01TastCaseData), nameof(Kata01TastCaseData.TestCases))]
-        public int Chopv3(int integer, int[] arrayOfIntegers)
+        public int Chopv3(int hiddenValue, int[] arrayOfValues)
         {
-            if (arrayOfIntegers == null || arrayOfIntegers.Length == 0)
+            if (arrayOfValues == null || arrayOfValues.Length == 0)
             {
                 return NotFound;
             }
 
-            return this.Chop(integer, arrayOfIntegers, arrayOfIntegers.Length);
+            var start = 1;
+            var end = this.CalculateSeekLength(start, arrayOfValues.Length);
+
+            return this.SeekInRange(hiddenValue, arrayOfValues, start, end);
         }
 
-        private int Chop(int integer, int[] arrayOfIntegers, int arrayLength, int lastChopEnd = 0)
+        private int SeekInRange(int hiddenValue, IReadOnlyList<int> arrayOfValues, int start, int end)
         {
-            int maxPosition = arrayLength - 1;
-            int chopStart = lastChopEnd;
-            int maxChopLength = maxPosition - chopStart;
-            double midChopPosition = (double)maxChopLength / 2;
+            var startIndex = ConvertToIndex(start);
+            var endIndex = ConvertToIndex(end);
 
-            int chopEnd = (int)Math.Round(midChopPosition, MidpointRounding.AwayFromZero);
-
-            for (int position = chopStart; position <= chopEnd; position++)
+            for (var seekIndex = startIndex; seekIndex <= endIndex; seekIndex++)
             {
-                if (arrayOfIntegers[position] == integer)
+                var value = arrayOfValues[seekIndex];
+                if (value == hiddenValue)
                 {
-                    return position;
+                    return seekIndex;
                 }
             }
 
-            if (chopEnd < maxPosition)
+            var nextStart = ConvertToPosition(end) + 1;
+
+            if (nextStart > arrayOfValues.Count)
             {
-                return this.Chop(integer, arrayOfIntegers, arrayLength, chopEnd);
+                return NotFound;
             }
 
-            return NotFound;
+            var nextEnd = nextStart + this.CalculateSeekLength(nextStart, arrayOfValues.Count);
+
+            return this.SeekInRange(hiddenValue, arrayOfValues, nextStart, nextEnd);
+        }
+
+        private static int ConvertToPosition(int index)
+        {
+            return index + 1;
+        }
+
+        private static int ConvertToIndex(int position)
+        {
+            return position - 1;
+        }
+
+        private int CalculateSeekLength(int start, int max)
+        {
+            var fullrange = max - start;
+            var middle = fullrange / 2;
+            return middle;
         }
 
         //public int Chopv2(int integer, int[] arrayOfIntegers)
