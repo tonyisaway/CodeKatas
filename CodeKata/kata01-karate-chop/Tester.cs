@@ -27,34 +27,24 @@
 
         private int SeekInRange(int hiddenValue, IReadOnlyList<int> arrayOfValues, int start, int end)
         {
-            var startIndex = ConvertToIndex(start);
-            var endIndex = ConvertToIndex(end);
-
-            for (var seekIndex = startIndex; seekIndex <= endIndex; seekIndex++)
+            while (end <= arrayOfValues.Count)
             {
-                var value = arrayOfValues[seekIndex];
-                if (value == hiddenValue)
+                for (var seekIndex = ConvertToIndex(start); seekIndex <= ConvertToIndex(end); seekIndex++)
                 {
-                    return seekIndex;
+                    var value = arrayOfValues[seekIndex];
+                    if (value == hiddenValue)
+                    {
+                        return seekIndex;
+                    }
                 }
+
+                start = end + 1;
+                end = start + this.CalculateSeekLength(start, arrayOfValues.Count);
             }
 
-            var nextStart = ConvertToPosition(end) + 1;
-
-            if (nextStart > arrayOfValues.Count)
-            {
-                return NotFound;
-            }
-
-            var nextEnd = nextStart + this.CalculateSeekLength(nextStart, arrayOfValues.Count);
-
-            return this.SeekInRange(hiddenValue, arrayOfValues, nextStart, nextEnd);
+            return NotFound;
         }
 
-        private static int ConvertToPosition(int index)
-        {
-            return index + 1;
-        }
 
         private static int ConvertToIndex(int position)
         {
@@ -67,6 +57,62 @@
             var middle = fullrange / 2;
             return middle;
         }
+
+        //public int Chopv3(int hiddenValue, int[] arrayOfValues)
+        //{
+        //    if (arrayOfValues == null || arrayOfValues.Length == 0)
+        //    {
+        //        return NotFound;
+        //    }
+
+        //    var start = 1;
+        //    var end = this.CalculateSeekLengthv3(start, arrayOfValues.Length);
+
+        //    return this.SeekInRangev3(hiddenValue, arrayOfValues, start, end);
+        //}
+
+        //private int SeekInRangev3(int hiddenValue, IReadOnlyList<int> arrayOfValues, int start, int end)
+        //{
+        //    var startIndex = ConvertToIndexv3(start);
+        //    var endIndex = ConvertToIndexv3(end);
+
+        //    for (var seekIndex = startIndex; seekIndex <= endIndex; seekIndex++)
+        //    {
+        //        var value = arrayOfValues[seekIndex];
+        //        if (value == hiddenValue)
+        //        {
+        //            return seekIndex;
+        //        }
+        //    }
+
+        //    var nextStart = ConvertToPositionv3(end) + 1;
+
+        //    if (nextStart > arrayOfValues.Count)
+        //    {
+        //        return NotFound;
+        //    }
+
+        //    var nextEnd = nextStart + this.CalculateSeekLengthv3(nextStart, arrayOfValues.Count);
+
+        //    return this.SeekInRangev3(hiddenValue, arrayOfValues, nextStart, nextEnd);
+        //}
+
+        //private static int ConvertToPositionv3(int index)
+        //{
+        //    return index + 1;
+        //}
+
+        //private static int ConvertToIndexv3(int position)
+        //{
+        //    return position - 1;
+        //}
+
+        //private int CalculateSeekLengthv3(int start, int max)
+        //{
+        //    var fullrange = max - start;
+        //    var middle = fullrange / 2;
+        //    return middle;
+        //}
 
         //public int Chopv2(int integer, int[] arrayOfIntegers)
         //{
